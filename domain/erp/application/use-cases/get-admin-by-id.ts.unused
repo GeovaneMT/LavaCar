@@ -1,0 +1,82 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { AdminDetails } from '@/domain/erp/enterprise/entities/value-objects/admin-details'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetAdminByIdUseCaseRequest {
+//   adminId: string
+//   currentUserId: string
+// }
+
+// type GetAdminByIdUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     adminDetails: AdminDetails
+//   }
+// >
+
+// @Injectable()
+// export class GetAdminByIdUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     adminId,
+//     currentUserId,
+//   }: GetAdminByIdUseCaseRequest): Promise<GetAdminByIdUseCaseResponse> {
+//     const context = GetAdminByIdUseCase.name
+
+//     this.logger.log(`👤 Fetching admin details by ID ${adminId}`, context)
+
+//     const adminDetails = await this.adminsRepository.findDetailsById(adminId)
+//     if (!adminDetails) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'Admin',
+//               resourceId: adminId,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     const isSelf = adminDetails.adminId.toString() === currentUserId
+
+//     this.logger.debug?.(
+//       `currentUserIsAdmin=${currentUserIsAdmin}, isSelf=${isSelf}`,
+//       context,
+//     )
+
+//     const isAnotherAdmin = !currentUserIsAdmin && !isSelf
+//     if (isAnotherAdmin) {
+//       return left(Error('Only admins can fetch other admin details'))
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched admin details for ID ${adminId}`,
+//       context,
+//     )
+
+//     return right({
+//       adminDetails,
+//     })
+//   }
+// }

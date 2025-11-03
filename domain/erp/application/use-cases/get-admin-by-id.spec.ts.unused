@@ -1,0 +1,118 @@
+// import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+
+// import { NotAllowedError } from '@/core/errors/errors/not-allowed.error'
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { Email } from '@/domain/erp/enterprise/entities/value-objects/email'
+
+// import { GetAdminByIdUseCase } from '@/domain/erp/application/use-cases/get-admin-by-id'
+
+// import { makePhone } from 'test/factories/make-phone'
+// import { makeAdmin } from 'test/factories/make-admin'
+
+// import { createDomainTestsFixture } from 'test/helpers/create-domain-test-fixture'
+
+// let fixture: ReturnType<typeof createDomainTestsFixture>
+
+// let sut: GetAdminByIdUseCase
+
+// describe('Get admin', () => {
+//   beforeEach(() => {
+//     fixture = createDomainTestsFixture()
+
+//     sut = new GetAdminByIdUseCase(fixture.logger, fixture.adminsRepo)
+//   })
+
+//   it('Should be able to get a admin by id from a self account', async () => {
+//     const newAdmin = makeAdmin({}, new UniqueEntityID('admin-1'))
+
+//     const phone1 = makePhone(
+//       {
+//         userRole: 'ADMIN',
+//         userId: newAdmin.id,
+//         number: '123956789',
+//       },
+//       new UniqueEntityID('phone-1'),
+//     )
+
+//     const phone2 = makePhone(
+//       {
+//         userRole: 'ADMIN',
+//         userId: newAdmin.id,
+//       },
+//       new UniqueEntityID('phone-2'),
+//     )
+
+//     // entities association
+//     newAdmin.phones.update([phone1, phone2])
+//     await fixture.adminsRepo.create(newAdmin)
+
+//     const result = await sut.execute({
+//       adminId: 'admin-1',
+//       currentUserId: 'admin-1',
+//     })
+
+//     if (result.isLeft()) throw result.value
+//     expect(result.isRight()).toBe(true)
+
+//     const admin = result.value.adminDetails
+//     expect(admin.adminId).toBe(newAdmin.id)
+//     expect(admin.name).toBe(newAdmin.name)
+//     expect(admin.email).toBe(newAdmin.email)
+
+//     // Phones
+//     expect(admin.phones).toHaveLength(2)
+//     expect(admin.phones.map((p) => p.number)).toEqual(
+//       expect.arrayContaining([phone1.number, phone2.number]),
+//     )
+//   })
+
+//   it('Should not be able to get unexistent admin', async () => {
+//     const result = await sut.execute({
+//       adminId: 'unexistent-admin-id',
+//       currentUserId: 'unexistent-admin-id',
+//     })
+
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+//   })
+
+//   it('Should not be able to get another admin', async () => {
+//     async function createTwoAdminsWithChildren() {
+//       const adminsData = [
+//         { id: 'admin-1', email: 'john.doe@example.com' },
+//         { id: 'admin-2', email: 'jane.foe@example.com' },
+//       ]
+
+//       for (const adminData of adminsData) {
+//         const admin = makeAdmin(
+//           { email: Email.create({ email: adminData.email }) },
+//           new UniqueEntityID(adminData.id),
+//         )
+
+//         // Phones
+//         const phone1 = makePhone(
+//           { userId: admin.id, number: '123456789', userRole: 'ADMIN' },
+//           new UniqueEntityID(`phone-${adminData.id}-1`),
+//         )
+//         const phone2 = makePhone(
+//           { userId: admin.id, number: '987654321', userRole: 'ADMIN' },
+//           new UniqueEntityID(`phone-${adminData.id}-2`),
+//         )
+//         admin.phones.update([phone1, phone2])
+
+//         await fixture.adminsRepo.create(admin)
+//       }
+//     }
+
+//     await createTwoAdminsWithChildren()
+
+//     const result = await sut.execute({
+//       adminId: 'admin-2',
+//       currentUserId: 'admin-1',
+//     })
+
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(NotAllowedError)
+//   })
+// })

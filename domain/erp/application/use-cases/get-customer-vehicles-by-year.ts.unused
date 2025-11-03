@@ -1,0 +1,94 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { CustomerVehicle } from '@/domain/erp/enterprise/entities/customer-vehicle'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { CustomerVehiclesRepository } from '@/domain/erp/application/repositories/customer-vehicles.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetCustomerVehiclesByYearUseCaseRequest {
+//   year: string
+//   page: number
+//   limit: number
+//   currentUserId: string
+// }
+
+// type GetCustomerVehiclesByYearUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     customerVehicles: CustomerVehicle[]
+//   }
+// >
+
+// @Injectable()
+// export class GetCustomerVehiclesByYearUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//     private customerVehiclesRepository: CustomerVehiclesRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     year,
+//     page,
+//     limit,
+//     currentUserId,
+//   }: GetCustomerVehiclesByYearUseCaseRequest): Promise<GetCustomerVehiclesByYearUseCaseResponse> {
+//     const context = GetCustomerVehiclesByYearUseCase.name
+//     this.logger.log(
+//       `🚗 Fetching customer vehicles by year ${year} for page ${page} with limit ${limit}`,
+//       context,
+//     )
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     this.logger.debug?.(`currentUserIsAdmin=${currentUserIsAdmin}`, context)
+
+//     if (!currentUserIsAdmin) {
+//       return left(Error('Only admins can fetch customer vehicles by year'))
+//     }
+
+//     const customerVehicles =
+//       await this.customerVehiclesRepository.findManyByYear(year, {
+//         page,
+//         limit,
+//       })
+
+//     this.logger.debug?.(
+//       `Found ${customerVehicles?.length} vehicles for year ${year}`,
+//       context,
+//     )
+
+//     if (!customerVehicles || !customerVehicles.length) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'Customer vehicles',
+//               resourceId: year,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched ${customerVehicles.length} vehicles for year ${year}`,
+//       context,
+//     )
+
+//     return right({
+//       customerVehicles,
+//     })
+//   }
+// }

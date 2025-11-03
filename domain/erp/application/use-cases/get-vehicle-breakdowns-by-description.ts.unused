@@ -1,0 +1,99 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { VehicleBreakdown } from '@/domain/erp/enterprise/entities/vehicle-breakdown'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { VehicleBreakdownsRepository } from '@/domain/erp/application/repositories/vehicle-breakdowns.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetVehicleBreakdownsByDescriptionUseCaseRequest {
+//   description: string
+//   page: number
+//   limit: number
+//   currentUserId: string
+// }
+
+// type GetVehicleBreakdownsByDescriptionUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     vehicleBreakdowns: VehicleBreakdown[]
+//   }
+// >
+
+// @Injectable()
+// export class GetVehicleBreakdownsByDescriptionUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//     private vehicleBreakdownsRepository: VehicleBreakdownsRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     description,
+//     page,
+//     limit,
+//     currentUserId,
+//   }: GetVehicleBreakdownsByDescriptionUseCaseRequest): Promise<GetVehicleBreakdownsByDescriptionUseCaseResponse> {
+//     const context = GetVehicleBreakdownsByDescriptionUseCase.name
+//     this.logger.log(
+//       `🚨 Fetching vehicle breakdowns by description "${description}" for page ${page} with limit ${limit}`,
+//       context,
+//     )
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     this.logger.debug?.(`currentUserIsAdmin=${currentUserIsAdmin}`, context)
+
+//     if (!currentUserIsAdmin) {
+//       return left(
+//         Error('Only admins can fetch vehicle breakdowns by description'),
+//       )
+//     }
+
+//     const vehicleBreakdowns =
+//       await this.vehicleBreakdownsRepository.findManyByDescription(
+//         description,
+//         {
+//           page,
+//           limit,
+//         },
+//       )
+
+//     this.logger.debug?.(
+//       `Found ${vehicleBreakdowns?.length} vehicle breakdowns for description "${description}"`,
+//       context,
+//     )
+
+//     if (!vehicleBreakdowns || !vehicleBreakdowns.length) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'Vehicle breakdowns',
+//               resourceId: description,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched ${vehicleBreakdowns.length} vehicle breakdowns for description "${description}"`,
+//       context,
+//     )
+
+//     return right({
+//       vehicleBreakdowns,
+//     })
+//   }
+// }

@@ -1,0 +1,370 @@
+// import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+
+// import { NotAllowedError } from '@/core/errors/errors/not-allowed.error'
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { Plate } from '@/domain/erp/enterprise/entities/value-objects/plate'
+// import { Email } from '@/domain/erp/enterprise/entities/value-objects/email'
+
+// import { GetCustomerVehicleByIdUseCase } from '@/domain/erp/application/use-cases/get-customer-vehicle-by-id'
+
+// import { makeAdmin } from 'test/factories/make-admin'
+// import { makeCustomer } from 'test/factories/make-customer'
+// import { makeAttachment } from 'test/factories/make-attachment'
+// import { makeCustomerVehicle } from 'test/factories/make-customer-vehicle'
+// import { makeVehicleBreakdown } from 'test/factories/make-vehicle-breakdown'
+// import { makeBreakdownAttachment } from 'test/factories/make-breakdown-attachments'
+
+// import { createDomainTestsFixture } from 'test/helpers/create-domain-test-fixture'
+
+// let fixture: ReturnType<typeof createDomainTestsFixture>
+
+// let sut: GetCustomerVehicleByIdUseCase
+
+// describe('Get customer vehicle', () => {
+//   beforeEach(() => {
+//     fixture = createDomainTestsFixture()
+
+//     sut = new GetCustomerVehicleByIdUseCase(
+//       fixture.logger,
+//       fixture.adminsRepo,
+//       fixture.customerVehiclesRepo,
+//     )
+//   })
+
+//   it('Should be able to get a self customer vehicle by id', async () => {
+//     makeCustomer(
+//       {
+//         email: Email.create({ email: 'john.doe@example.com' }),
+//       },
+//       new UniqueEntityID('customer-1'),
+//     )
+
+//     const customerVehicle1 = makeCustomerVehicle(
+//       {
+//         plate: Plate.create({ plate: 'ABC1234' }),
+//         customerId: new UniqueEntityID('customer-1'),
+//       },
+//       new UniqueEntityID('vehicle-1'),
+//     )
+
+//     const customerVehicle2 = makeCustomerVehicle(
+//       {
+//         plate: Plate.create({ plate: 'ABC1234' }),
+//         customerId: new UniqueEntityID('customer-1'),
+//       },
+
+//       new UniqueEntityID('vehicle-2'),
+//     )
+
+//     const vehicleBreakdown1 = makeVehicleBreakdown(
+//       {
+//         vehicleId: customerVehicle1.id,
+//       },
+//       new UniqueEntityID('breakdown-1'),
+//     )
+
+//     const vehicleBreakdown2 = makeVehicleBreakdown(
+//       {
+//         vehicleId: customerVehicle1.id,
+//       },
+//       new UniqueEntityID('breakdown-2'),
+//     )
+
+//     const attachment1 = makeAttachment({
+//       title: 'Attachment 1',
+//       url: 'https://example.com/attachment-1',
+//     })
+
+//     const attachment2 = makeAttachment({
+//       title: 'Attachment 2',
+//       url: 'https://example.com/attachment-2',
+//     })
+
+//     const attachment3 = makeAttachment({
+//       title: 'Attachment 3',
+//       url: 'https://example.com/attachment-3',
+//     })
+
+//     const attachment4 = makeAttachment({
+//       title: 'Attachment 4',
+//       url: 'https://example.com/attachment-4',
+//     })
+
+//     const breakdownAttachment1 = makeBreakdownAttachment({
+//       attachmentId: attachment1.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment2 = makeBreakdownAttachment({
+//       attachmentId: attachment2.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment3 = makeBreakdownAttachment({
+//       attachmentId: attachment3.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     const breakdownAttachment4 = makeBreakdownAttachment({
+//       attachmentId: attachment4.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     // entities association
+//     customerVehicle1.breakdowns.update([vehicleBreakdown1, vehicleBreakdown2])
+//     vehicleBreakdown1.attachments.update([
+//       breakdownAttachment1,
+//       breakdownAttachment2,
+//     ])
+//     vehicleBreakdown2.attachments.update([
+//       breakdownAttachment3,
+//       breakdownAttachment4,
+//     ])
+
+//     await fixture.attachmentsRepo.create(attachment1)
+//     await fixture.attachmentsRepo.create(attachment2)
+//     await fixture.attachmentsRepo.create(attachment3)
+//     await fixture.attachmentsRepo.create(attachment4)
+
+//     await fixture.customerVehiclesRepo.createMany([
+//       customerVehicle1,
+//       customerVehicle2,
+//     ])
+
+//     const result = await sut.execute({
+//       id: 'vehicle-1',
+//       currentUserId: 'customer-1',
+//     })
+
+//     if (result.isLeft()) throw new Error(result.value.message)
+//     expect(result.isRight()).toBe(true)
+
+//     const vehicle = result.value.vehicleDetails
+//     expect(vehicle.plate).toBe(customerVehicle1.plate)
+
+//     const breakdowns = vehicle.breakdownDetails
+//     expect(breakdowns).toHaveLength(2)
+
+//     // Breakdown 1
+//     const bd1 = breakdowns.find((b) => b.breakdownId === vehicleBreakdown1.id)
+//     expect(bd1).toBeDefined()
+//     expect(bd1!.attachments.map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment1.attachmentId,
+//         breakdownAttachment2.attachmentId,
+//       ]),
+//     )
+
+//     // Breakdown 2
+//     const bd2 = breakdowns.find((b) => b.breakdownId === vehicleBreakdown2.id)
+//     expect(bd2).toBeDefined()
+//     expect(bd2!.attachments.map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment3.attachmentId,
+//         breakdownAttachment4.attachmentId,
+//       ]),
+//     )
+//   })
+
+//   it('Should be able to get a customer vehicle by id from an admin account', async () => {
+//     await fixture.adminsRepo.create(
+//       makeAdmin({}, new UniqueEntityID('admin-1')),
+//     )
+
+//     const customerVehicle1 = makeCustomerVehicle(
+//       {
+//         plate: Plate.create({ plate: 'ABC1234' }),
+//         customerId: new UniqueEntityID('customer-1'),
+//       },
+//       new UniqueEntityID('vehicle-1'),
+//     )
+
+//     const customerVehicle2 = makeCustomerVehicle(
+//       {
+//         plate: Plate.create({ plate: 'ABC1234' }),
+//         customerId: new UniqueEntityID('customer-1'),
+//       },
+//       new UniqueEntityID('vehicle-2'),
+//     )
+
+//     const vehicleBreakdown1 = makeVehicleBreakdown(
+//       {
+//         vehicleId: customerVehicle1.id,
+//       },
+//       new UniqueEntityID('breakdown-1'),
+//     )
+
+//     const vehicleBreakdown2 = makeVehicleBreakdown(
+//       {
+//         vehicleId: customerVehicle1.id,
+//       },
+//       new UniqueEntityID('breakdown-2'),
+//     )
+
+//     const attachment1 = makeAttachment({
+//       title: 'Attachment 1',
+//       url: 'https://example.com/attachment-1',
+//     })
+
+//     const attachment2 = makeAttachment({
+//       title: 'Attachment 2',
+//       url: 'https://example.com/attachment-2',
+//     })
+
+//     const attachment3 = makeAttachment({
+//       title: 'Attachment 3',
+//       url: 'https://example.com/attachment-3',
+//     })
+
+//     const attachment4 = makeAttachment({
+//       title: 'Attachment 4',
+//       url: 'https://example.com/attachment-4',
+//     })
+
+//     const breakdownAttachment1 = makeBreakdownAttachment({
+//       attachmentId: attachment1.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment2 = makeBreakdownAttachment({
+//       attachmentId: attachment2.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment3 = makeBreakdownAttachment({
+//       attachmentId: attachment3.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     const breakdownAttachment4 = makeBreakdownAttachment({
+//       attachmentId: attachment4.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     // entities association
+//     customerVehicle1.breakdowns.update([vehicleBreakdown1, vehicleBreakdown2])
+//     vehicleBreakdown1.attachments.update([
+//       breakdownAttachment1,
+//       breakdownAttachment2,
+//     ])
+//     vehicleBreakdown2.attachments.update([
+//       breakdownAttachment3,
+//       breakdownAttachment4,
+//     ])
+
+//     await fixture.attachmentsRepo.create(attachment1)
+//     await fixture.attachmentsRepo.create(attachment2)
+//     await fixture.attachmentsRepo.create(attachment3)
+//     await fixture.attachmentsRepo.create(attachment4)
+
+//     await fixture.customerVehiclesRepo.createMany([
+//       customerVehicle1,
+//       customerVehicle2,
+//     ])
+
+//     const result = await sut.execute({
+//       id: 'vehicle-1',
+//       currentUserId: 'admin-1',
+//     })
+
+//     if (result.isLeft()) throw new Error(result.value.detail)
+//     expect(result.isRight()).toBe(true)
+
+//     const vehicle = result.value.vehicleDetails
+//     expect(vehicle.plate).toBe(customerVehicle1.plate)
+
+//     const breakdowns = vehicle.breakdownDetails
+//     expect(breakdowns).toHaveLength(2)
+
+//     // Breakdown 1
+//     const bd1 = breakdowns.find((b) => b.breakdownId === vehicleBreakdown1.id)
+//     expect(bd1).toBeDefined()
+//     expect(bd1!.attachments.map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment1.attachmentId,
+//         breakdownAttachment2.attachmentId,
+//       ]),
+//     )
+
+//     // Breakdown 2
+//     const bd2 = breakdowns.find((b) => b.breakdownId === vehicleBreakdown2.id)
+//     expect(bd2).toBeDefined()
+//     expect(bd2!.attachments.map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment3.attachmentId,
+//         breakdownAttachment4.attachmentId,
+//       ]),
+//     )
+//   })
+
+//   it('Should not be able to get unexistent customer vehicle', async () => {
+//     await fixture.adminsRepo.create(
+//       makeAdmin({}, new UniqueEntityID('admin-1')),
+//     )
+
+//     const result = await sut.execute({
+//       id: 'unexistent-vehicle-id',
+//       currentUserId: 'admin-1',
+//     })
+
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+//   })
+
+//   it('Should not be able to get a vehicle from another customer', async () => {
+//     makeCustomer(
+//       {
+//         email: Email.create({ email: 'john.doe@example.com' }),
+//       },
+//       new UniqueEntityID('customer-1'),
+//     )
+
+//     makeCustomer(
+//       {
+//         email: Email.create({ email: 'john.doe@example.com' }),
+//       },
+//       new UniqueEntityID('customer-2'),
+//     )
+
+//     const customerVehicle1 = makeCustomerVehicle(
+//       {
+//         plate: Plate.create({ plate: 'ABC1234' }),
+//         customerId: new UniqueEntityID('customer-1'),
+//       },
+//       new UniqueEntityID('vehicle-1'),
+//     )
+
+//     const vehicleBreakdown1 = makeVehicleBreakdown(
+//       {
+//         vehicleId: customerVehicle1.id,
+//       },
+//       new UniqueEntityID('breakdown-1'),
+//     )
+
+//     const attachment1 = makeAttachment({
+//       title: 'Attachment 1',
+//       url: 'https://example.com/attachment-1',
+//     })
+
+//     const breakdownAttachment1 = makeBreakdownAttachment({
+//       attachmentId: attachment1.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     // entities association
+//     customerVehicle1.breakdowns.update([vehicleBreakdown1])
+//     vehicleBreakdown1.attachments.update([breakdownAttachment1])
+
+//     await fixture.attachmentsRepo.create(attachment1)
+//     await fixture.customerVehiclesRepo.create(customerVehicle1)
+
+//     const result = await sut.execute({
+//       id: 'vehicle-1',
+//       currentUserId: 'customer-2',
+//     })
+
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(NotAllowedError)
+//   })
+// })

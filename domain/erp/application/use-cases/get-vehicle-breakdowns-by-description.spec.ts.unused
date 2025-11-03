@@ -1,0 +1,156 @@
+// import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+
+// import { NotAllowedError } from '@/core/errors/errors/not-allowed.error'
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { GetVehicleBreakdownsByDescriptionUseCase } from '@/domain/erp/application/use-cases/get-vehicle-breakdowns-by-description'
+
+// import { makeAdmin } from 'test/factories/make-admin'
+// import { makeAttachment } from 'test/factories/make-attachment'
+// import { makeVehicleBreakdown } from 'test/factories/make-vehicle-breakdown'
+// import { makeBreakdownAttachment } from 'test/factories/make-breakdown-attachments'
+
+// import { createDomainTestsFixture } from 'test/helpers/create-domain-test-fixture'
+
+// let fixture: ReturnType<typeof createDomainTestsFixture>
+
+// let sut: GetVehicleBreakdownsByDescriptionUseCase
+
+// describe('Get vehicle breakdowns', () => {
+//   beforeEach(() => {
+//     fixture = createDomainTestsFixture()
+
+//     sut = new GetVehicleBreakdownsByDescriptionUseCase(
+//       fixture.logger,
+//       fixture.adminsRepo,
+//       fixture.vehicleBreakdownsRepo,
+//     )
+//   })
+
+//   it('Should be able to get vehicle breakdowns by description from a admin account', async () => {
+//     await fixture.adminsRepo.create(
+//       makeAdmin({}, new UniqueEntityID('admin-1')),
+//     )
+
+//     const vehicleBreakdown1 = makeVehicleBreakdown({
+//       description: 'Description 1',
+//     })
+
+//     const vehicleBreakdown2 = makeVehicleBreakdown({
+//       description: 'Description 2',
+//     })
+
+//     const attachment1 = makeAttachment({
+//       title: 'Attachment 1',
+//       url: 'https://example.com/attachment-1',
+//     })
+
+//     const attachment2 = makeAttachment({
+//       title: 'Attachment 2',
+//       url: 'https://example.com/attachment-2',
+//     })
+
+//     const attachment3 = makeAttachment({
+//       title: 'Attachment 3',
+//       url: 'https://example.com/attachment-3',
+//     })
+
+//     const attachment4 = makeAttachment({
+//       title: 'Attachment 4',
+//       url: 'https://example.com/attachment-4',
+//     })
+
+//     const breakdownAttachment1 = makeBreakdownAttachment({
+//       attachmentId: attachment1.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment2 = makeBreakdownAttachment({
+//       attachmentId: attachment2.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment3 = makeBreakdownAttachment({
+//       attachmentId: attachment3.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     const breakdownAttachment4 = makeBreakdownAttachment({
+//       attachmentId: attachment4.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     // entities association
+//     vehicleBreakdown1.attachments.update([
+//       breakdownAttachment1,
+//       breakdownAttachment2,
+//     ])
+//     vehicleBreakdown2.attachments.update([
+//       breakdownAttachment3,
+//       breakdownAttachment4,
+//     ])
+
+//     await fixture.attachmentsRepo.create(attachment1)
+//     await fixture.attachmentsRepo.create(attachment2)
+//     await fixture.attachmentsRepo.create(attachment3)
+//     await fixture.attachmentsRepo.create(attachment4)
+
+//     await fixture.vehicleBreakdownsRepo.createMany([
+//       vehicleBreakdown1,
+//       vehicleBreakdown2,
+//     ])
+
+//     const result = await sut.execute({
+//       page: 1,
+//       limit: 10,
+//       description: 'Description 1',
+//       currentUserId: 'admin-1',
+//     })
+
+//     if (result.isLeft()) throw new Error(result.value.message)
+//     expect(result.isRight()).toBe(true)
+
+//     const breakdowns = result.value.vehicleBreakdowns
+//     expect(breakdowns).toHaveLength(1)
+
+//     const bd = breakdowns[0]
+//     expect(bd.id).toBe(vehicleBreakdown1.id)
+
+//     const attachmentIds = bd.attachments.getItems().map((a) => a.id)
+//     expect(attachmentIds).toHaveLength(2)
+//     expect(attachmentIds).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment1.id,
+//         breakdownAttachment2.id,
+//       ]),
+//     )
+//   })
+
+//   it('Should not be able to fetch unexistent breakdowns', async () => {
+//     await fixture.adminsRepo.create(
+//       makeAdmin({}, new UniqueEntityID('admin-1')),
+//     )
+
+//     const result = await sut.execute({
+//       description: 'unexistent description',
+//       page: 1,
+//       limit: 100,
+//       currentUserId: 'admin-1',
+//     })
+
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+//   })
+
+//   it('Should not be able to fetch customers from a non-admin account', async () => {
+//     const result = await sut.execute({
+//       description: 'anydescription',
+//       page: 1,
+//       limit: 100,
+//       currentUserId: 'customer-1',
+//     })
+
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(NotAllowedError)
+//   })
+// })

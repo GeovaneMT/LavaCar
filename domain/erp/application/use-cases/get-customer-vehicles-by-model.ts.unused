@@ -1,0 +1,94 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { CustomerVehicle } from '@/domain/erp/enterprise/entities/customer-vehicle'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { CustomerVehiclesRepository } from '@/domain/erp/application/repositories/customer-vehicles.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetCustomerVehiclesByModelUseCaseRequest {
+//   model: string
+//   page: number
+//   limit: number
+//   currentUserId: string
+// }
+
+// type GetCustomerVehiclesByModelUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     customerVehicles: CustomerVehicle[]
+//   }
+// >
+
+// @Injectable()
+// export class GetCustomerVehiclesByModelUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//     private customerVehiclesRepository: CustomerVehiclesRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     model,
+//     page,
+//     limit,
+//     currentUserId,
+//   }: GetCustomerVehiclesByModelUseCaseRequest): Promise<GetCustomerVehiclesByModelUseCaseResponse> {
+//     const context = GetCustomerVehiclesByModelUseCase.name
+//     this.logger.log(
+//       `🚗 Fetching customer vehicles by model ${model} for page ${page} with limit ${limit}`,
+//       context,
+//     )
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     this.logger.debug?.(`currentUserIsAdmin=${currentUserIsAdmin}`, context)
+
+//     if (!currentUserIsAdmin) {
+//       return left(Error('Only admins can fetch customer vehicles by model'))
+//     }
+
+//     const customerVehicles =
+//       await this.customerVehiclesRepository.findManyByModel(model, {
+//         page,
+//         limit,
+//       })
+
+//     this.logger.debug?.(
+//       `Found ${customerVehicles?.length} vehicles for model ${model}`,
+//       context,
+//     )
+
+//     if (!customerVehicles || !customerVehicles.length) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'Customer vehicles',
+//               resourceId: model,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched ${customerVehicles.length} vehicles for model ${model}`,
+//       context,
+//     )
+
+//     return right({
+//       customerVehicles,
+//     })
+//   }
+// }

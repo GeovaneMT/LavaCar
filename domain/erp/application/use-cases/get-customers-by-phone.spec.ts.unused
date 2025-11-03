@@ -1,0 +1,336 @@
+// import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+
+// import { Name } from '@/domain/erp/enterprise/entities/value-objects/name'
+// import { Email } from '@/domain/erp/enterprise/entities/value-objects/email'
+// import { GetCustomerByPhoneUseCase } from '@/domain/erp/application/use-cases/get-customers-by-phone'
+
+// import { NotAllowedError } from '@/core/errors/errors/not-allowed.error'
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { makePhone } from 'test/factories/make-phone'
+// import { makeAdmin } from 'test/factories/make-admin'
+// import { makeCustomer } from 'test/factories/make-customer'
+// import { makeAttachment } from 'test/factories/make-attachment'
+// import { makeCustomerVehicle } from 'test/factories/make-customer-vehicle'
+// import { makeVehicleBreakdown } from 'test/factories/make-vehicle-breakdown'
+// import { makeBreakdownAttachment } from 'test/factories/make-breakdown-attachments'
+
+// import { createDomainTestsFixture } from 'test/helpers/create-domain-test-fixture'
+
+// let fixture: ReturnType<typeof createDomainTestsFixture>
+
+// let sut: GetCustomerByPhoneUseCase
+
+// describe('Get Customer', () => {
+//   beforeEach(() => {
+//     fixture = createDomainTestsFixture()
+
+//     sut = new GetCustomerByPhoneUseCase(
+//       fixture.logger,
+//       fixture.adminsRepo,
+//       fixture.customersRepo,
+//     )
+//   })
+
+//   it('Should be able to get a customer by phone', async () => {
+//     await fixture.adminsRepo.create(
+//       makeAdmin({}, new UniqueEntityID('admin-1')),
+//     )
+
+//     const newCustomer = makeCustomer(
+//       {
+//         name: Name.create({
+//           firstName: 'John',
+//           lastName: 'Doe',
+//           username: 'John Doe',
+//         }),
+
+//         email: Email.create({ email: 'john.doe@example.com' }),
+//       },
+//       new UniqueEntityID('customer-1'),
+//     )
+
+//     makeCustomer(
+//       {
+//         name: Name.create({
+//           firstName: 'John',
+//           lastName: 'Doe',
+//           username: 'John Doe',
+//         }),
+
+//         email: Email.create({ email: 'john.second@example.com' }),
+//       },
+//       new UniqueEntityID('customer-2'),
+//     )
+
+//     const phone1 = makePhone(
+//       {
+//         userRole: 'CUSTOMER',
+//         userId: newCustomer.id,
+//         number: '123956789',
+//       },
+//       new UniqueEntityID('phone-1'),
+//     )
+
+//     const phone2 = makePhone(
+//       {
+//         userRole: 'CUSTOMER',
+//         userId: newCustomer.id,
+//       },
+//       new UniqueEntityID('phone-2'),
+//     )
+
+//     const customerVehicle1 = makeCustomerVehicle(
+//       {
+//         customerId: newCustomer.id,
+//       },
+//       new UniqueEntityID('vehicle-1'),
+//     )
+
+//     const customerVehicle2 = makeCustomerVehicle(
+//       {
+//         customerId: newCustomer.id,
+//       },
+//       new UniqueEntityID('vehicle-2'),
+//     )
+
+//     const vehicleBreakdown1 = makeVehicleBreakdown({
+//       vehicleId: customerVehicle1.id,
+//     })
+
+//     const vehicleBreakdown2 = makeVehicleBreakdown({
+//       vehicleId: customerVehicle1.id,
+//     })
+
+//     const vehicleBreakdown3 = makeVehicleBreakdown({
+//       vehicleId: customerVehicle2.id,
+//     })
+
+//     const vehicleBreakdown4 = makeVehicleBreakdown({
+//       vehicleId: customerVehicle2.id,
+//     })
+
+//     const attachment1 = makeAttachment({
+//       title: 'Attachment 1',
+//       url: 'https://example.com/attachment-1',
+//     })
+
+//     const attachment2 = makeAttachment({
+//       title: 'Attachment 2',
+//       url: 'https://example.com/attachment-2',
+//     })
+
+//     const attachment3 = makeAttachment({
+//       title: 'Attachment 3',
+//       url: 'https://example.com/attachment-3',
+//     })
+
+//     const attachment4 = makeAttachment({
+//       title: 'Attachment 4',
+//       url: 'https://example.com/attachment-4',
+//     })
+
+//     const attachment5 = makeAttachment({
+//       title: 'Attachment 5',
+//       url: 'https://example.com/attachment-5',
+//     })
+
+//     const attachment6 = makeAttachment({
+//       title: 'Attachment 6',
+//       url: 'https://example.com/attachment-6',
+//     })
+
+//     const attachment7 = makeAttachment({
+//       title: 'Attachment 7',
+//       url: 'https://example.com/attachment-7',
+//     })
+
+//     const attachment8 = makeAttachment({
+//       title: 'Attachment 8',
+//       url: 'https://example.com/attachment-8',
+//     })
+
+//     const breakdownAttachment1 = makeBreakdownAttachment({
+//       attachmentId: attachment1.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment2 = makeBreakdownAttachment({
+//       attachmentId: attachment2.id,
+//       breakdownId: vehicleBreakdown1.id,
+//     })
+
+//     const breakdownAttachment3 = makeBreakdownAttachment({
+//       attachmentId: attachment3.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     const breakdownAttachment4 = makeBreakdownAttachment({
+//       attachmentId: attachment4.id,
+//       breakdownId: vehicleBreakdown2.id,
+//     })
+
+//     const breakdownAttachment5 = makeBreakdownAttachment({
+//       attachmentId: attachment5.id,
+//       breakdownId: vehicleBreakdown3.id,
+//     })
+
+//     const breakdownAttachment6 = makeBreakdownAttachment({
+//       attachmentId: attachment6.id,
+//       breakdownId: vehicleBreakdown3.id,
+//     })
+
+//     const breakdownAttachment7 = makeBreakdownAttachment({
+//       attachmentId: attachment7.id,
+//       breakdownId: vehicleBreakdown4.id,
+//     })
+
+//     const breakdownAttachment8 = makeBreakdownAttachment({
+//       attachmentId: attachment8.id,
+//       breakdownId: vehicleBreakdown4.id,
+//     })
+
+//     // entities association
+//     newCustomer.phones.update([phone1, phone2])
+//     newCustomer.vehicles.update([customerVehicle1, customerVehicle2])
+//     customerVehicle1.breakdowns.update([vehicleBreakdown1, vehicleBreakdown2])
+//     customerVehicle2.breakdowns.update([vehicleBreakdown3, vehicleBreakdown4])
+//     vehicleBreakdown1.attachments.update([
+//       breakdownAttachment1,
+//       breakdownAttachment2,
+//     ])
+//     vehicleBreakdown2.attachments.update([
+//       breakdownAttachment3,
+//       breakdownAttachment4,
+//     ])
+//     vehicleBreakdown3.attachments.update([
+//       breakdownAttachment5,
+//       breakdownAttachment6,
+//     ])
+//     vehicleBreakdown4.attachments.update([
+//       breakdownAttachment7,
+//       breakdownAttachment8,
+//     ])
+
+//     await fixture.attachmentsRepo.create(attachment1)
+//     await fixture.attachmentsRepo.create(attachment2)
+//     await fixture.attachmentsRepo.create(attachment3)
+//     await fixture.attachmentsRepo.create(attachment4)
+//     await fixture.attachmentsRepo.create(attachment5)
+//     await fixture.attachmentsRepo.create(attachment6)
+//     await fixture.attachmentsRepo.create(attachment7)
+//     await fixture.attachmentsRepo.create(attachment8)
+
+//     await fixture.customersRepo.create(newCustomer)
+
+//     const result = await sut.execute({
+//       phone: '123',
+//       page: 1,
+//       limit: 10,
+//       currentUserId: 'admin-1',
+//     })
+
+//     if (result.isLeft()) throw result.value
+//     const customers = result.value.customers
+//     expect(customers).toHaveLength(1)
+
+//     const customer = customers.find((c) => c.id === newCustomer.id)
+//     expect(customer).toBeDefined()
+//     expect(customer!.name).toBe(newCustomer.name)
+//     expect(customer!.email).toBe(newCustomer.email)
+
+//     // Phones
+//     const phones = customer!.phones.getItems()
+//     expect(phones).toHaveLength(2)
+//     expect(phones.map((p) => p.number)).toEqual(
+//       expect.arrayContaining([phone1.number, phone2.number]),
+//     )
+
+//     // Vehicles
+//     const vehicles = customer!.vehicles.getItems()
+//     expect(vehicles).toHaveLength(2)
+
+//     // Vehicle 1
+//     const vehicle1 = vehicles.find((v) => v.plate === customerVehicle1.plate)
+//     expect(vehicle1).toBeDefined()
+
+//     const breakdowns1 = vehicle1!.breakdowns.getItems()
+//     expect(breakdowns1).toHaveLength(2)
+
+//     // Breakdown 1 of Vehicle 1
+//     const bd1 = breakdowns1.find((b) => b.id === vehicleBreakdown1.id)
+//     expect(bd1).toBeDefined()
+//     expect(bd1!.attachments.getItems().map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment1.id,
+//         breakdownAttachment2.id,
+//       ]),
+//     )
+
+//     // Breakdown 2 of Vehicle 1
+//     const bd2 = breakdowns1.find((b) => b.id === vehicleBreakdown2.id)
+//     expect(bd2).toBeDefined()
+//     expect(bd2!.attachments.getItems().map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment3.id,
+//         breakdownAttachment4.id,
+//       ]),
+//     )
+
+//     // Vehicle 2
+//     const vehicle2 = vehicles.find((v) => v.plate === customerVehicle2.plate)
+//     expect(vehicle2).toBeDefined()
+
+//     const breakdowns2 = vehicle2!.breakdowns.getItems()
+//     expect(breakdowns2).toHaveLength(2)
+
+//     // Breakdown 1 of Vehicle 2
+//     const bd3 = breakdowns2.find((b) => b.id === vehicleBreakdown3.id)
+//     expect(bd3).toBeDefined()
+//     expect(bd3!.attachments.getItems().map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment5.id,
+//         breakdownAttachment6.id,
+//       ]),
+//     )
+
+//     // Breakdown 2 of Vehicle 2
+//     const bd4 = breakdowns2.find((b) => b.id === vehicleBreakdown4.id)
+//     expect(bd4).toBeDefined()
+//     expect(bd4!.attachments.getItems().map((a) => a.id)).toEqual(
+//       expect.arrayContaining([
+//         breakdownAttachment7.id,
+//         breakdownAttachment8.id,
+//       ]),
+//     )
+//   })
+
+//   it('Should not be able to fetch unexistent customers', async () => {
+//     await fixture.adminsRepo.create(
+//       makeAdmin({}, new UniqueEntityID('admin-1')),
+//     )
+
+//     const result = await sut.execute({
+//       phone: '123',
+//       page: 1,
+//       limit: 10,
+//       currentUserId: 'admin-1',
+//     })
+
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(ResourceNotFoundError)
+//   })
+
+//   it('Should not be able to fetch customers from a non-admin account', async () => {
+//     makeCustomer({}, new UniqueEntityID('customer-1'))
+
+//     const result = await sut.execute({
+//       phone: '123',
+//       page: 1,
+//       limit: 10,
+//       currentUserId: 'admin-1',
+//     })
+//     expect(result.isRight()).toBe(false)
+//     expect(result.value).toBeInstanceOf(NotAllowedError)
+//   })
+// })

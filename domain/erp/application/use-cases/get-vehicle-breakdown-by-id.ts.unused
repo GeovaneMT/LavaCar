@@ -1,0 +1,90 @@
+// import { Injectable } from '@nestjs/common'
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { BreakdownDetails } from '@/domain/erp/enterprise/entities/value-objects/breakdown-details'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { VehicleBreakdownsRepository } from '@/domain/erp/application/repositories/vehicle-breakdowns.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetVehicleBreakdownByIdUseCaseRequest {
+//   id: string
+//   currentUserId: string
+// }
+
+// type GetVehicleBreakdownByIdUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     breakdownDetails: BreakdownDetails
+//   }
+// >
+
+// @Injectable()
+// export class GetVehicleBreakdownByIdUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//     private vehicleBreakdownsRepository: VehicleBreakdownsRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     id,
+//     currentUserId,
+//   }: GetVehicleBreakdownByIdUseCaseRequest): Promise<GetVehicleBreakdownByIdUseCaseResponse> {
+//     const context = GetVehicleBreakdownByIdUseCase.name
+//     this.logger.log(
+//       `🚨 Fetching vehicle breakdown details by ID ${id}`,
+//       context,
+//     )
+
+//     const breakdownDetails =
+//       await this.vehicleBreakdownsRepository.findDetailsById(id)
+//     if (!breakdownDetails) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'vehicle breakdown',
+//               resourceId: id,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     const isSelf = breakdownDetails.ownerId.toString() === currentUserId
+
+//     this.logger.debug?.(
+//       `currentUserIsAdmin=${currentUserIsAdmin}, isSelf=${isSelf}`,
+//       context,
+//     )
+
+//     const isAnotherCustomer = !currentUserIsAdmin && !isSelf
+//     if (isAnotherCustomer) {
+//       return left(
+//         Error(
+//           'You are not allowed to fetch vehicle breakdown details for another customer',
+//         ),
+//       )
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched vehicle breakdown details for ID ${id}`,
+//       context,
+//     )
+
+//     return right({
+//       breakdownDetails,
+//     })
+//   }
+// }

@@ -1,0 +1,96 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { Customer } from '@/domain/erp/enterprise/entities/customer'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { CustomersRepository } from '@/domain/erp/application/repositories/customers.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetCustomerByPhoneUseCaseRequest {
+//   phone: string
+//   page: number
+//   limit: number
+//   currentUserId: string
+// }
+
+// type GetCustomerByPhoneUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     customers: Customer[]
+//   }
+// >
+
+// @Injectable()
+// export class GetCustomerByPhoneUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//     private customersRepository: CustomersRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     phone,
+//     page,
+//     limit,
+//     currentUserId,
+//   }: GetCustomerByPhoneUseCaseRequest): Promise<GetCustomerByPhoneUseCaseResponse> {
+//     const context = GetCustomerByPhoneUseCase.name
+//     this.logger.log(
+//       `📞 Fetching customers by phone ${phone} for page ${page} with limit ${limit}`,
+//       context,
+//     )
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     this.logger.debug?.(`currentUserIsAdmin=${currentUserIsAdmin}`, context)
+
+//     if (!currentUserIsAdmin) {
+//       return left(Error('Only admins can fetch customers by phone'))
+//     }
+
+//     const customers = await this.customersRepository.findManyByPhoneNumber(
+//       phone,
+//       {
+//         page,
+//         limit,
+//       },
+//     )
+
+//     this.logger.debug?.(
+//       `Found ${customers?.length} customers for phone ${phone}`,
+//       context,
+//     )
+
+//     if (!customers || !customers.length) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'Customers',
+//               resourceId: phone,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched ${customers.length} customers for phone ${phone}`,
+//       context,
+//     )
+
+//     return right({
+//       customers,
+//     })
+//   }
+// }

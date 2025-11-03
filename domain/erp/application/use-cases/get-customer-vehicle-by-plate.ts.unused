@@ -1,0 +1,86 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { VehicleDetails } from '@/domain/erp/enterprise/entities/value-objects/vehicle-details'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { CustomerVehiclesRepository } from '@/domain/erp/application/repositories/customer-vehicles.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetCustomerVehicleByPlateUseCaseRequest {
+//   plate: string
+//   currentUserId: string
+// }
+
+// type GetCustomerVehicleByPlateUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     vehicleDetails: VehicleDetails
+//   }
+// >
+
+// @Injectable()
+// export class GetCustomerVehicleByPlateUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//     private customerVehiclesRepository: CustomerVehiclesRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     plate,
+//     currentUserId,
+//   }: GetCustomerVehicleByPlateUseCaseRequest): Promise<GetCustomerVehicleByPlateUseCaseResponse> {
+//     const context = GetCustomerVehicleByPlateUseCase.name
+//     this.logger.log(`🚗 Fetching vehicle details by plate ${plate}`, context)
+
+//     const vehicleDetails =
+//       await this.customerVehiclesRepository.findDetailsByPlate(plate)
+//     if (!vehicleDetails) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'vehicle details',
+//               resourceId: plate,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     const isSelf = vehicleDetails.ownerId.toString() === currentUserId
+
+//     this.logger.debug?.(
+//       `currentUserIsAdmin=${currentUserIsAdmin}, isSelf=${isSelf}`,
+//       context,
+//     )
+
+//     const isAnotherCustomer = !currentUserIsAdmin && !isSelf
+//     if (isAnotherCustomer) {
+//       return left(
+//         Error('You do not have permission to view this vehicle details'),
+//       )
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched vehicle details for plate ${plate}`,
+//       context,
+//     )
+
+//     return right({
+//       vehicleDetails,
+//     })
+//   }
+// }

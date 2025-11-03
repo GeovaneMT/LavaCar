@@ -1,0 +1,97 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { NotAllowedError } from '@/core/errors/errors/not-allowed.error'
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { VehicleBreakdown } from '@/domain/erp/enterprise/entities/vehicle-breakdown'
+
+// import { VehicleBreakdownsRepository } from '@/domain/erp/application/repositories/vehicle-breakdowns.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// import { CaslErpPolicyService } from '@/domain/erp/application/auth/casl/services/casl-erp-policy.service'
+// import { CaslVehicleBreakdownMapper } from '@/domain/erp/application/auth/casl/mappers/casl-vehicle-breakdown.mapper'
+
+// interface GetVehicleBreakdownsByVehicleIdUseCaseRequest {
+//   vehicleId: string
+//   currentUserId: string
+// }
+
+// type GetVehicleBreakdownsByVehicleIdUseCaseResponse = Either<
+//   NotAllowedError | ResourceNotFoundError,
+//   {
+//     vehicleBreakdowns: VehicleBreakdown[]
+//   }
+// >
+
+// @Injectable()
+// export class GetVehicleBreakdownsByVehicleIdUseCase extends UseCaseBase {
+//   static errors = [NotAllowedError, ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private caslPermissionService: CaslErpPolicyService,
+//     private vehicleBreakdownsRepository: VehicleBreakdownsRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     vehicleId,
+//     currentUserId,
+//   }: GetVehicleBreakdownsByVehicleIdUseCaseRequest): Promise<GetVehicleBreakdownsByVehicleIdUseCaseResponse> {
+//     const context = GetVehicleBreakdownsByVehicleIdUseCase.name
+
+//     this.logger.log(
+//       `🚨 Fetching vehicle breakdowns for vehicle ID ${vehicleId}`,
+//       context,
+//     )
+
+//     const vehicleBreakdowns =
+//       await this.vehicleBreakdownsRepository.findManyByVehicleId(vehicleId)
+
+//     this.logger.debug?.(
+//       `Found ${vehicleBreakdowns?.length} vehicle breakdowns for vehicle ID ${vehicleId}`,
+//       context,
+//     )
+
+//     if (!vehicleBreakdowns || !vehicleBreakdowns.length) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'Vehicle breakdowns',
+//               resourceId: vehicleId,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     for (const vehicleBreakdown of vehicleBreakdowns) {
+//       const permissionResult = await this.caslPermissionService.verifyAbilities(
+//         {
+//           userId: currentUserId,
+//           appAbilities: [
+//             'CREATE',
+//             CaslVehicleBreakdownMapper.toCasl(vehicleBreakdown),
+//           ],
+//         },
+//       )
+
+//       if (permissionResult.isLeft()) return left(permissionResult.value)
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched ${vehicleBreakdowns.length} vehicle breakdowns for vehicle ID ${vehicleId}`,
+//       context,
+//     )
+
+//     return right({
+//       vehicleBreakdowns,
+//     })
+//   }
+// }

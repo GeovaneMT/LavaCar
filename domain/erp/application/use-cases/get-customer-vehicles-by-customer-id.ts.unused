@@ -1,0 +1,88 @@
+// import { Injectable } from '@nestjs/common'
+
+// import { Either, left, right } from '@/core/either'
+// import { LoggerPort } from '@/core/ports/logger.port'
+
+// import { ResourceNotFoundError } from '@/core/errors/errors/resource-not-found.error'
+
+// import { CustomerVehicle } from '@/domain/erp/enterprise/entities/customer-vehicle'
+
+// import { AdminsRepository } from '@/domain/erp/application/repositories/admins.repository'
+// import { CustomerVehiclesRepository } from '@/domain/erp/application/repositories/customer-vehicles.repository'
+// import { UseCaseBase } from '@/core/entities/base-use-case'
+
+// interface GetCustomerVehiclesByCustomerIdUseCaseRequest {
+//   customerId: string
+//   currentUserId: string
+// }
+
+// type GetCustomerVehiclesByCustomerIdUseCaseResponse = Either<
+//   Error | ResourceNotFoundError,
+//   {
+//     customerVehicles: CustomerVehicle[]
+//   }
+// >
+
+// @Injectable()
+// export class GetCustomerVehiclesByCustomerIdUseCase extends UseCaseBase {
+//   static errors = [ResourceNotFoundError]
+
+//   constructor(
+//     logger: LoggerPort,
+//     private adminsRepository: AdminsRepository,
+//     private customerVehiclesRepository: CustomerVehiclesRepository,
+//   ) {
+//     super(logger)
+//   }
+
+//   async execute({
+//     customerId,
+//     currentUserId,
+//   }: GetCustomerVehiclesByCustomerIdUseCaseRequest): Promise<GetCustomerVehiclesByCustomerIdUseCaseResponse> {
+//     const context = GetCustomerVehiclesByCustomerIdUseCase.name
+//     this.logger.log(
+//       `🚗 Fetching vehicles for customer ID ${customerId}`,
+//       context,
+//     )
+
+//     const currentUserIsAdmin =
+//       !!(await this.adminsRepository.findById(currentUserId))
+//     this.logger.debug?.(`currentUserIsAdmin=${currentUserIsAdmin}`, context)
+
+//     if (!currentUserIsAdmin) {
+//       return left(
+//         Error('Only admins can fetch customer vehicles by customer ID'),
+//       )
+//     }
+
+//     const customerVehicles =
+//       await this.customerVehiclesRepository.findManyByCustomerId(customerId)
+//     this.logger.debug?.(
+//       `Found ${customerVehicles?.length} vehicles for customer ID ${customerId}`,
+//       context,
+//     )
+
+//     if (!customerVehicles || !customerVehicles.length) {
+//       return left(
+//         ResourceNotFoundError.create(
+//           {
+//             details: {
+//               resource: 'Customer vehicles',
+//               resourceId: `customer id: ${customerId}`,
+//             },
+//           },
+//           this.logger,
+//         ),
+//       )
+//     }
+
+//     this.logger.log(
+//       `✅ Successfully fetched ${customerVehicles.length} vehicles for customer ID ${customerId}`,
+//       context,
+//     )
+
+//     return right({
+//       customerVehicles,
+//     })
+//   }
+// }
